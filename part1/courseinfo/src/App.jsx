@@ -43,12 +43,6 @@ const Total = (props) => {
   );
 };
 
-// export default Footer
-
-// export default Content
-
-// export default Header
-
 const App = () => {
   const course = {
     name: "Half Stack application development",
