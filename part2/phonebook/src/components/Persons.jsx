@@ -1,11 +1,12 @@
 import React from "react";
 
 const Person = ({ persons }) => {
-  let id = 1;
+  console.log(persons);
+
   return (
     <ul>
       {persons.map((person) => (
-        <li key={Math.random()}>
+        <li key={person.id}>
           {person.name} : {person.number}
         </li>
       ))}
