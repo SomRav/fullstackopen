@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Persons from "./components/Persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import axios from "axios";
+import crudService from "./services/persons";
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
@@ -10,29 +10,44 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   // fetch the data from json server
-  const handleEffectHook = () => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+  useEffect(() => {
+    crudService.getAll().then((initPerson) => {
+      setPersons(initPerson);
     });
-  };
-  useEffect(handleEffectHook, []);
+  }, []);
 
   const addPerson = (e) => {
     e.preventDefault();
 
     const nameExist = persons.some((person) => person.name === newName);
     if (nameExist) {
-      alert(`${newName} is already added to phonebook`);
+      if (
+        window.confirm(
+          `${newName} is already exist in phonebook. Replace the old number with a new one?`
+        )
+      ) {
+        const person = persons.find((p) => p.name === newName);
+        crudService
+          .update(person.id, { ...person, number: newNumber })
+          .then((updatedData) => {
+            setPersons(
+              persons.map((p) => (p.id === person.id ? updatedData : p))
+            );
+          });
+      } else {
+        alert(`${newName} already exist in phonebook`);
+      }
     } else {
       const newPerson = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1,
       };
-      setPersons(persons.concat(newPerson));
+      crudService.create(newPerson).then((personData) => {
+        setPersons(persons.concat(personData));
+        setNewName("");
+        setNumber("");
+      });
     }
-    setNewName("");
-    setNumber("");
   };
 
   const handleNameChange = (e) => {
@@ -51,6 +66,17 @@ const App = () => {
     person.name.toLowerCase().includes(filter.toLowerCase())
   );
 
+  const deleteDataOf = (id, name) => {
+    console.log(`the data of ${id} and ${name} to be deleted...`);
+    if (window.confirm(`Do you want to delete ${name}`)) {
+      crudService
+        .deletePerson(id)
+        .then(() => setPersons(persons.filter((p) => p.id !== id)));
+    } else {
+      console.log("delete cancelled by user");
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -64,7 +90,7 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={filterdPersons} />
+      <Persons persons={filterdPersons} deleteDataOf={deleteDataOf} />
     </div>
   );
 };
