@@ -1,0 +1,17 @@
+body {
+  position: relative;
+}
+.notification {
+  background-color: #e6ffed; /* Light green background */
+  color: #027a48; /* Dark green text */
+  padding: 12px 16px;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  font-size: 14px;
+  max-width: 400px;
+  margin: 8px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
