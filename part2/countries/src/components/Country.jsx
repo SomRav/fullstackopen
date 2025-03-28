@@ -26,7 +26,10 @@ const Country = ({
       .then((reponse) => {
         const temperature = reponse.data.main.temp;
         const windSpeed = reponse.data.wind.speed;
-        setWeather({ temperature, windSpeed });
+        const weatherIcon = reponse.data.weather[0].icon;
+        const weatherDesc = reponse.data.weather[0].description;
+        console.log({ temperature, windSpeed, weatherIcon, weatherDesc });
+        setWeather({ temperature, windSpeed, weatherIcon, weatherDesc });
       });
   }, []);
 
@@ -46,6 +49,15 @@ const Country = ({
       <h3>Weather in {countryName}</h3>
       <p>
         Temperature: {weather ? `${weather.temperature}*C` : "no data"} <br />{" "}
+        {weather ? (
+          <img
+            src={`https://openweathermap.org/img/wn/${weather.weatherIcon}@2x.png`}
+            alt={weather.weatherDesc}
+          />
+        ) : (
+          "no data"
+        )}
+        <br />
         Wind speed: {weather ? `${weather.windSpeed}m/s` : "no data"}
       </p>
     </div>
