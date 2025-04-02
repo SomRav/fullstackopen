@@ -99,23 +99,54 @@ app.get("/info", (request, response) => {
   });
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
-  Person.findById(id).then((note) => {
-    note ? response.json(note) : response.status(404).end();
-  });
+  Person.findById(id)
+    .then((note) => {
+      note ? response.json(note) : response.status(404).end();
+    })
+    .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
-  Person.findByIdAndDelete(id).then((deletedPerson) => {
-    if (deletedPerson) {
-      return response.status(204).end();
-    } else {
-      return request.status(404).end();
-    }
-  });
+  Person.findByIdAndDelete(id)
+    .then((deletedPerson) => {
+      if (deletedPerson) {
+        return response.status(204).end();
+      } else {
+        return request.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const { name, number } = request.body;
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (!person) {
+        return response.status(404).end();
+      }
+      person.number = number;
+      return person.save().then((updatedPerson) => {
+        response.json(updatedPerson);
+      });
+    })
+    .catch((error) => next(error));
+});
+
+const unknownEndPoint = (request, response) => {
+  response.status(404).send({ error: "Are you lost Baby girl?" });
+};
+app.use(unknownEndPoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
