@@ -51,15 +51,23 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      crudService.create(newPerson).then((personData) => {
-        setPersons(persons.concat(personData));
-        setErrorMessage(`${newName} added to the phone book sucsessfully!`);
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-        setNewName("");
-        setNumber("");
-      });
+      crudService
+        .create(newPerson)
+        .then((personData) => {
+          setPersons(persons.concat(personData));
+          setErrorMessage(`${newName} added to the phone book sucsessfully!`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
+          setNewName("");
+          setNumber("");
+        })
+        .catch((error) => {
+          console.log("Caught an error!", error.response.data.error);
+          const errorMsg = error.response.data.error;
+          setErrorMessage(errorMsg);
+          setTimeout(() => setErrorMessage(null), 5000);
+        });
     }
   };
 

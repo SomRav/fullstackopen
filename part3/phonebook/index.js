@@ -2,11 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
-const cors = require("cors");
 
 app.use(express.static("dist"));
 app.use(express.json());
-app.use(cors());
 
 morgan.token("body", (request) => {
   if (request.method === "POST") {
@@ -20,29 +18,6 @@ app.use(
   )
 );
 
-// let persons = [
-//   {
-//     id: "1",
-//     name: "Arto Hellas",
-//     number: "040-123456",
-//   },
-//   {
-//     id: "2",
-//     name: "Ada Lovelace",
-//     number: "39-44-5323523",
-//   },
-//   {
-//     id: "3",
-//     name: "Dan Abramov",
-//     number: "12-43-234345",
-//   },
-//   {
-//     id: "4",
-//     name: "Mary Poppendieck",
-//     number: "39-23-6423122",
-//   },
-// ];
-
 const Person = require("./model/person");
 
 app.get("/", (request, response) => {
@@ -55,7 +30,7 @@ app.get("/api/persons", (request, response) => {
   });
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   if (!body.name || !body.number) {
     const errorMessage =
@@ -82,9 +57,12 @@ app.post("/api/persons", (request, response) => {
       number: body.number,
     });
 
-    person.save().then((savedPerson) => {
-      response.json(savedPerson);
-    });
+    person
+      .save()
+      .then((savedPerson) => {
+        response.json(savedPerson);
+      })
+      .catch((error) => next(error));
   });
 });
 
@@ -142,7 +120,10 @@ const unknownEndPoint = (request, response) => {
 app.use(unknownEndPoint);
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message);
+  // console.error(error.message);
+  if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
+  }
   next(error);
 };
 
