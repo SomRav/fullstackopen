@@ -12,6 +12,7 @@ mongoose
   .connect(config.MONGODB_URI)
   .then(() => {
     logger.info("Successfully Connected to DB");
+    logger.info("URL", config.MONGODB_URI);
   })
   .catch((error) => {
     logger.error("Failed to connect DB", error.message);
