@@ -1,2 +1,2 @@
 # fullstackopen
-my solutions to the exercises of fullstackopen course  
+My solutions to the exercises from the Full Stack Open course
